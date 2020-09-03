@@ -6,6 +6,7 @@ schema:
   schema_id: zhuyin
   version: '1.0.0'
   author:
+    - 洋蔥 <deltazonetw@gmail.com>
     - Far Tseng <farrrr@gmail.com>
   description: |
     基本注音輸入方案，符合台灣用戶使用習慣。
@@ -115,8 +116,8 @@ translator:
   dictionary: zhuyin # 翻譯器將調取此字典文件
   prism: zhuyin # 設定由此主翻譯器的 speller 生成的棱鏡文件名，或此副編譯器調用的棱鏡名
   preedit_format: # 上屛碼自定義
-    - "xlit|1qaz2wsxedcrfv5tgbyhnujm8ik,9ol.0p;/- 6347'| ㄅㄆㄇㄈㄉㄊㄋㄌㄍㄎㄏㄐㄑㄒㄓㄔㄕㄖㄗㄘㄙㄧㄨㄩㄚㄛㄜㄝㄞㄟㄠㄡㄢㄣㄤㄥㄦˉˊˇˋ˙ |"
-    - 'xform/\\//' # 分隔字以空白替代反斜線
+    - "xlit|1qaz2wsxedcrfv5tgbyhnujm8ik,9ol.0p;/- 6347'|ㄅㄆㄇㄈㄉㄊㄋㄌㄍㄎㄏㄐㄑㄒㄓㄔㄕㄖㄗㄘㄙㄧㄨㄩㄚㄛㄜㄝㄞㄟㄠㄡㄢㄣㄤㄥㄦˉˊˇˋ˙ |"
+    - 'xform/\\/ /' # 分隔字以空白替代反斜線
 
 custom_phrase:
   dictionary: ''
