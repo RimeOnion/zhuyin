@@ -1,0 +1,14 @@
+# encoding: utf-8
+---
+recipe:
+  Rx: disable
+  arg:
+    - schema=zhuyin
+  desciption: >-
+    Remove scehma to list of enabled schemas.
+
+patch_files:
+  default.custom.yaml:
+    - patch/+:
+        schema_list/+/+:
+          - schema: ${schema:-zhuyin}
