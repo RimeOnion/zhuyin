@@ -6,9 +6,9 @@
 
 ## 環境設定
 
-需先安裝依據台灣輸入習慣之 [predule](https://github.com/RimeOnion/predule) 與 [八股文](https://github.com/RimeOnion/essay)
+需先安裝依據台灣輸入習慣之 [predule](https://github.com/RimeOnion/prelude) 與 [八股文](https://github.com/RimeOnion/essay)
 
-[東風破](https://github.com/rime/plum) 安裝口令： `bash rime-install RimeOnion/predule RimeOnion/essay`
+[東風破](https://github.com/rime/plum) 安裝口令： `bash rime-install RimeOnion/prelude RimeOnion/essay`
 
 ## 安裝
 
