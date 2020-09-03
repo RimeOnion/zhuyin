@@ -4,7 +4,7 @@
 schema:
   name: 基本注音
   schema_id: zhuyin
-  version: '1.0.0'
+  version: '1.0.1'
   author:
     - 洋蔥 <deltazonetw@gmail.com>
     - Far Tseng <farrrr@gmail.com>
