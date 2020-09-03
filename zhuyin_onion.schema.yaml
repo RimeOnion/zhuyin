@@ -1,0 +1,107 @@
+# Rime schema
+# encoding: utf-8
+
+schema:
+  name: 洋蔥注音基本版
+  schema_id: zhuyin_onion
+  version: '1.0.0'
+  author:
+    - 洋蔥 <deltazonetw@gmail.com>
+    - Far Tseng <farrrr@gmail.com>
+  description: |
+    洋蔥注音基本版輸入方案，採用「大千式」鍵盤排列。
+
+switches:
+  __include: zhuyin.schema:/switches
+
+engine:
+  __include: zhuyin.schema:/engine
+  __patch:
+    translators:
+      - punct_translator # 配合 `punct_segmentor` 轉換標點符號
+      - table_translator@custom_phrase # 碼表翻譯器，用於倉頡、五筆等基於碼表的輸入方案，此項可加載多個實例，後接 @+ 翻譯器名〔如：cangjie、wubi 等〕
+      # - ua_translator@t2_translator
+      - script_translator # 腳本翻譯器，用於拼音、粵拼等基於音節表的輸入方案，此項可加載多個實例，後接 @+ 翻譯器名〔如：pinyin、jyutping 等〕
+
+menu:
+  __include: zhuyin.schema:/menu
+
+# -- Speller -- #
+speller:
+  __include: zhuyin.schema:/speller
+  __patch:
+    delimiter: "\\" # 上屛時的音節間分音符 (注音中較無意義，因注音有聲調符號)
+    algebra: # 拼寫運算規則，由之算出的拼寫匯入 prism 中
+      - erase/^xx$/
+      - xform/^m(\d)$/mu$1/ # 呣
+      - xform/^r5$/er5/ # 〜兒
+      - xform/iu/iou/
+      - xform/ui/uei/
+      - xform/ong/ung/
+      - xform/yi?/i/
+      - xform/wu?/u/
+      - xform/iu/v/
+      - xform/([jqx])u/$1v/
+      - xform/([iuv])n/$1en/
+      - xform/zhi?/Z/
+      - xform/chi?/C/
+      - xform/shi?/S/
+      - xform/([zcsr])i/$1/
+      - xform/ai/A/
+      - xform/ei/I/
+      - xform/ao/O/
+      - xform/ou/U/
+      - xform/ang/K/
+      - xform/eng/G/
+      - xform/an/M/
+      - xform/en/N/
+      - xform/er/R/
+      - xform/eh/E/
+      - xform/([iv])e/$1E/
+      # 注音簡化輸入
+      - abbrev/^([bpmfdtnlgkhjqxZCSrzcsiuvaoeEAIOUMNKGR]).+$/$1/
+      - abbrev/^([bpmfdtnlgkhjqxZCSrzcsiuv])([iuvaoeEAIOUMNKGR])\d$/$1$2/
+      - abbrev/^([bpmfdtnlgkhjqxZCSrzcs])([iuv])([aoeEAIOUMNKGR])\d$/$1$2$3/
+      - abbrev/^([bpmfdtnlgkhjqx]).+(\d)$/$1$2/ #同上，但再少了ㄓㄔㄕㄖㄗㄘㄙ
+      # 注音聲韻母亂序
+      - derive/^([bpmfdtnlgkhjqxZCSrzcs])([iuv])/$2$1/
+      - derive/^([iuv])([aoeEAIOUMNKGR])/$2$1/
+      - derive/^([bpmfdtnlgkhjqxZCSrzcs])([aoeEAIOUMNKGR])/$2$1/
+      - derive/^([bpmfdtnlgkhjqxZCSrzcs])([iuv])([aoeEAIOUMNKGR])/$3$2$1/
+      - derive/^([bpmfdtnlgkhjqxZCSrzcs])([iuv])([aoeEAIOUMNKGR])/$3$1$2/
+      - derive/^([bpmfdtnlgkhjqxZCSrzcs])([iuv])([aoeEAIOUMNKGR])/$2$3$1/
+      - derive/^([bpmfdtnlgkhjqxZCSrzcs])([iuv])([aoeEAIOUMNKGR])/$1$3$2/
+      - 'xlit|bpmfdtnlgkhjqxZCSrzcsiuvaoeEAIOUMNKGR12345|1qaz2wsxedcrfv5tgbyhnujm8ik,9ol.0p;/- 6347|'
+
+# -- Translators -- #
+translator:
+  __include: zhuyin.schema:/translator
+
+custom_phrase:
+  __include: zhuyin.schema:/custom_phrase
+
+# -- Processors -- #
+recognizer:
+  import_preset: default
+
+editor:
+  bindings:
+    Return: confirm # 使用 express_editor 時打開
+    Shift+Return: commit_raw_input # 上屏原始輸入
+    Control+Return: commit_script_text # 上屏變換後輸入
+
+key_binder:
+  import_preset: default
+
+punctuator:
+  import_preset: symbols
+
+# -- Filters -- #
+simplifier:
+  __include: zhuyin.schema:/simplifier
+
+big5:
+  __include: zhuyin.schema:/big5
+
+gbk:
+  __include: zhuyin.schema:/gbk
