@@ -9,6 +9,6 @@ recipe:
 
 patch_files:
   default.custom.yaml:
-    - patch/+:
-        schema_list/+/+:
+    - patch/-:
+        schema_list/-:
           - schema: ${schema:-zhuyin}
