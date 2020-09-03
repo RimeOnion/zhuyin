@@ -1,0 +1,152 @@
+# Rime schema
+# encoding: utf-8
+
+schema:
+  name: 基本注音
+  schema_id: zhuyin
+  version: '1.0.0'
+  author:
+    - Far Tseng <farrrr@gmail.com>
+  description: |
+    基本注音輸入方案，符合台灣用戶使用習慣。
+    移除許多花俏功能，主要以無痛轉換為目的，也用做為其他注音方案之基底。
+    功能：亂序輸入、簡繁轉換、可省略音調輸入。
+
+switches:
+  # ascii_mode 是中英文轉換開關。預設 0 爲中文，1 爲英文
+  - name: ascii_mode
+    reset: 0
+    states: ['中', '英']
+  # full_shape 是全角符號／半角符號開關。注意，開啓全角時英文字母亦爲全角。0 爲半角，1 爲全角
+  - name: full_shape
+    reset: 0
+    states: ['半形', '全形']
+  # ascii_punct 是中英文標點轉換開關，0 爲中文句讀，1 爲英文標點。
+  - name: ascii_punct
+    reset: 0
+    states: ['中式標點', '英式標點']
+  # simplification 是轉化字開關。一般情況下與上同，0 爲不開啓轉化，1 爲轉化。
+  - name: simplification
+    states: ['繁體', '简体']
+  # 字符集過濾。此選項沒有默認名偁，須配合 charset_filter 使用。可單用，亦可添加多套字符集：
+  - options: [utf-8, big5, gbk]
+    states:
+      - 字集 → 全部
+      - 字集 → 台灣
+      - 字集 → 大陸
+
+engine:
+  processors:
+    - ascii_composer # 處理西文模式及中西文切
+    - recognizer # 與 `matcher` 搭配，處理符合特定規則的輸入碼，如網址、反查等 `tags`
+    - key_binder # 在特定條件下將按鍵綁定到其他按鍵，如重定義逗號、句號爲候選翻頁、開關快捷鍵等
+    - speller # 拼寫處理器，接受字符按鍵，編輯輸入
+    - punctuator # 句讀處理器，將單個字符按鍵直接映射爲標點符號或文字
+    - selector # 選字處理器，處理數字選字鍵〔可以換成別的哦〕、上、下候選定位、換頁
+    - navigator # 處理輸入欄內的光標移動
+    - express_editor # 編輯器，處理空格、回車上屏、回退鍵
+  segmentors:
+    - ascii_segmentor # 標識西文段落〔譬如在西文模式下〕字母直接上屛
+    - matcher # 配合 `recognizer` 標識符合特定規則的段落，如網址、反查等，加上特定 `tag`
+    - abc_segmentor # 標識常規的文字段落，加上 `abc` 這個 `tag`
+    - punct_segmentor # 標識句讀段落〔鍵入標點符號用〕加上 `punct` 這個 `tag`
+    - fallback_segmentor # 標識其他未標識段落
+  # XXX:
+  translators:
+    - punct_translator # 配合 `punct_segmentor` 轉換標點符號
+    - table_translator@custom_phrase # 碼表翻譯器，用於倉頡、五筆等基於碼表的輸入方案，此項可加載多個實例，後接 @+ 翻譯器名〔如：cangjie、wubi 等〕
+    - script_translator # 腳本翻譯器，用於拼音、粵拼等基於音節表的輸入方案，此項可加載多個實例，後接 @+ 翻譯器名〔如：pinyin、jyutping 等〕
+  # XXX:
+  filter:
+    - charset_filter@big5 # 僅繁體字集
+    - charset_filter@gbk # 僅簡體字集
+    - simplifier # 繁簡轉換
+    - uniquifier # 過濾重複的候選字，有可能來自 `simplifier`
+
+menu:
+  alternatives_select_keys: '123456789' # 如編碼字符佔用數字鍵則須另設選字鍵
+  page_size: 9 # 選單每頁顯示個數
+
+# -- Speller -- #
+speller:
+  alphabet: '1qaz2wsxedcrfv5tgbyhnujm8ik,9ol.0p;/- 3467' # 定義本方案輸入鍵
+  initials: '1qaz2wsxedcrfv5tgbyhnujm8ik,9ol.0p;/-' # 定義僅作始碼之鍵
+  finals: ' 6347' # 定義僅作末碼之鍵
+  delimiter: "'" # 上屛時的音節間分音符 (注音中較無意義，因注音有聲調符號)
+  use_space: true # 以空格作輸入碼〔true 或 false〕
+  algebra: # 拼寫運算規則，由之算出的拼寫匯入 prism 中
+    - erase/^xx$/
+    - xform/^m(\d)$/mu$1/ # 呣
+    - xform/^r5$/er5/ # 〜兒
+    - xform/iu/iou/
+    - xform/ui/uei/
+    - xform/ong/ung/
+    - xform/yi?/i/
+    - xform/wu?/u/
+    - xform/iu/v/
+    - xform/([jqx])u/$1v/
+    - xform/([iuv])n/$1en/
+    - xform/zhi?/Z/
+    - xform/chi?/C/
+    - xform/shi?/S/
+    - xform/([zcsr])i/$1/
+    - xform/ai/A/
+    - xform/ei/I/
+    - xform/ao/O/
+    - xform/ou/U/
+    - xform/ang/K/
+    - xform/eng/G/
+    - xform/an/M/
+    - xform/en/N/
+    - xform/er/R/
+    - xform/eh/E/
+    - xform/([iv])e/$1E/
+    # 注音聲韻母亂序
+    - derive/([bpmfdtnlgkhjqxZCSrzcs])([iuv])/$2$1/ # 聲母介符亂序
+    - derive/([iuv])([aoeEAIOUMNKGR])/$2$1/ # 介符韻母亂序
+    - derive/([bpmfdtnlgkhjqxZCSrzcs])([aoeEAIOUMNKGR])/$2$1/ # 聲母韻母亂序
+    - derive/([bpmfdtnlgkhjqxZCSrzcs])([iuv])/$2$1/ # 聲母介符亂序
+    # 簡化方案
+    - abbrev/^([A-Za-z]+)\d$/$1/ # 音調簡化
+    - 'xlit|bpmfdtnlgkhjqxZCSrzcsiuvaoeEAIOUMNKGR12345|1qaz2wsxedcrfv5tgbyhnujm8ik,9ol.0p;/- 6347|'
+
+# -- Translators -- #
+translator:
+  dictionary: zhuyin # 翻譯器將調取此字典文件
+  prism: zhuyin # 設定由此主翻譯器的 speller 生成的棱鏡文件名，或此副編譯器調用的棱鏡名
+  preedit_format: # 上屛碼自定義
+    - "xlit|1qaz2wsxedcrfv5tgbyhnujm8ik,9ol.0p;/- 6347'| ㄅㄆㄇㄈㄉㄊㄋㄌㄍㄎㄏㄐㄑㄒㄓㄔㄕㄖㄗㄘㄙㄧㄨㄩㄚㄛㄜㄝㄞㄟㄠㄡㄢㄣㄤㄥㄦˉˊˇˋ˙ |"
+    - 'xform/\\//' # 分隔字以空白替代反斜線
+
+custom_phrase:
+  dictionary: ''
+  user_dict: custom_phrase # 設定用戶詞典名
+  db_class: stabledb # 設定用戶詞典類型，可設tabledb〔文本〕或userdb〔二進制〕
+  enable_completion: false # 提前顯示尚未輸入完整碼的字〔僅table_translator有效〕
+  enable_sentence: false # 是否開啓自動造句
+  initial_quality: 1 # 設定此翻譯器出字優先級
+
+# -- Processors -- #
+recognizer:
+  import_preset: default
+
+editor:
+  bindings:
+    space: toggle_selection
+    Return: confirm # 使用 express_editor 時打開
+
+key_binder:
+  import_preset: default
+
+punctuator:
+  import_preset: symbols
+
+# -- Filters -- #
+simplifier:
+  tips: all #  設定是否提示轉換前的字，可塡 none〔或不塡〕、char〔僅對單字有效〕、all
+
+big5:
+  tags: [abc]
+
+gbk:
+  tags: [abc]
